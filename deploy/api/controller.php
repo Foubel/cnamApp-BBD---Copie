@@ -95,8 +95,7 @@ require_once '../bootstrap.php';
 		$utilisateurRepository = $entityManager->getRepository('Utilisateurs');
 		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
 
-		//if ($utilisateur && password_verify($password, $utilisateur->getPassword())) {
-		if ($utilisateur && $password == $utilisateur->getPassword()) {
+		if ($utilisateur && password_verify($password, $utilisateur->getPassword())) {
 			$userData = [
 				'id' => $utilisateur->getId(),
 				'nom' => $utilisateur->getNom(),
@@ -147,8 +146,7 @@ require_once '../bootstrap.php';
 			$utilisateur->setEmail($email);
 			$utilisateur->setSexe($sexe);
 			$utilisateur->setLogin($login);
-			//$utilisateur->setPassword(password_hash($password, PASSWORD_DEFAULT));
-			$utilisateur->setPassword($password);
+			$utilisateur->setPassword(password_hash($password, PASSWORD_DEFAULT));
 			$utilisateur->setTelephone($telephone);
 
 			$entityManager->persist($utilisateur);
