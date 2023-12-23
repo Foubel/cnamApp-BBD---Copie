@@ -112,6 +112,7 @@ require_once '../bootstrap.php';
 	function postRegister(Request $request, Response $response, $args) {
 		global $entityManager;
 		$data = $request->getParsedBody();
+		var_dump($data);
 		$nom = $data['nom'] ?? "";
 		$prenom = $data['prenom'] ?? "";
 		$adresse = $data['adresse'] ?? "";
@@ -122,18 +123,6 @@ require_once '../bootstrap.php';
 		$login = $data['login'] ?? "";
 		$password = $data['password'] ?? "";
 		$telephone = $data['telephone'] ?? "";
-
-		//on netttoie les données
-		$nom = filter_var($nom, FILTER_SANITIZE_STRING);
-		$prenom = filter_var($prenom, FILTER_SANITIZE_STRING);
-		$adresse = filter_var($adresse, FILTER_SANITIZE_STRING);
-		$codePostal = filter_var($codePostal, FILTER_SANITIZE_STRING);
-		$ville = filter_var($ville, FILTER_SANITIZE_STRING);
-		$email = filter_var($email, FILTER_SANITIZE_EMAIL);
-		$sexe = filter_var($sexe, FILTER_SANITIZE_STRING);
-		$login = filter_var($login, FILTER_SANITIZE_STRING);
-		$password = filter_var($password, FILTER_SANITIZE_STRING);
-		$telephone = filter_var($telephone, FILTER_SANITIZE_STRING);
 
 		$utilisateurRepository = $entityManager->getRepository('Utilisateurs');
 		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
