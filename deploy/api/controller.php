@@ -90,7 +90,7 @@ require_once '../bootstrap.php';
 		$login = $data['login'] ?? "";
 		$password = $data['password'] ?? "";
 
-		$utilisateurRepository = $entityManager->getRepository('Utilisateur');
+		$utilisateurRepository = $entityManager->getRepository('Utilisateurs');
 		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
 
 		if ($utilisateur && password_verify($password, $utilisateur->getPassword())) {
@@ -135,8 +135,7 @@ require_once '../bootstrap.php';
 		$password = filter_var($password, FILTER_SANITIZE_STRING);
 		$telephone = filter_var($telephone, FILTER_SANITIZE_STRING);
 
-
-		$utilisateurRepository = $entityManager->getRepository('Utilisateur');
+		$utilisateurRepository = $entityManager->getRepository('Utilisateurs');
 		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
 
 		if ($utilisateur) {
