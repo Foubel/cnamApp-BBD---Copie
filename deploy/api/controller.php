@@ -115,8 +115,8 @@ require_once '../bootstrap.php';
 	function postRegister(Request $request, Response $response, $args) {
 		global $entityManager;
 		$data = $request->getParsedBody();
-		console_log($data);
-
+		var_dump($data);
+		
 		$nom = $data['nom'] ?? "";
 		$prenom = $data['prenom'] ?? "";
 		$adresse = $data['adresse'] ?? "";
