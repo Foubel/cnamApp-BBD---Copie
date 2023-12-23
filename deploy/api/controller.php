@@ -2,7 +2,6 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-// require once bootstrap.php
 require_once '../bootstrap.php';
 
 	function optionsCatalogue (Request $request, Response $response, $args) {
@@ -27,23 +26,28 @@ require_once '../bootstrap.php';
 		$catalogueRepository = $entityManager->getRepository('Catalogue');
 		
 		$queryParams = $request->getQueryParams();
-		$criteria = [];
+		$queryBuilder = $catalogueRepository->createQueryBuilder('c');
+
 	
 		if (!empty($queryParams['id'])) {
-			$criteria['id'] = $queryParams['id'];
+			$queryBuilder->andWhere('c.id = :id')
+						 ->setParameter('id', $queryParams['id']);
 		}
 		if (!empty($queryParams['name'])) {
-			$criteria['name'] = $queryParams['name'];
+			$queryBuilder->andWhere('c.name LIKE :name')
+						 ->setParameter('name', '%' . $queryParams['name'] . '%');
 		}
 		if (!empty($queryParams['description'])) {
-			$criteria['description'] = $queryParams['description'];
+			$queryBuilder->andWhere('c.description LIKE :description')
+						 ->setParameter('description', '%' . $queryParams['description'] . '%');
 		}
 		if (!empty($queryParams['price'])) {
-			$criteria['price'] = (string) $queryParams['price'];
+			$queryBuilder->andWhere('CAST(c.price AS CHAR) LIKE :price')
+						 ->setParameter('price', '%' . $queryParams['price'] . '%');
 		}
 	
-		$catalogueItems = $catalogueRepository->findBy($criteria);
-	
+		$catalogueItems = $queryBuilder->getQuery()->getResult();
+
 		$catalogueArray = [];
 		foreach ($catalogueItems as $item) {
 			$catalogueArray[] = [
@@ -58,7 +62,6 @@ require_once '../bootstrap.php';
 		return addHeaders($response);
 	}
 	
-
 	
 	function optionsUtilisateur (Request $request, Response $response, $args) {
 	    
