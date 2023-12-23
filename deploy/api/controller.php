@@ -116,7 +116,7 @@ require_once '../bootstrap.php';
 		global $entityManager;
 		$data = $request->getParsedBody();
 		var_dump($data);
-		$nom = $data['nom'] ?? "";
+		$nom = $data['nom'] ?? "erreur test";
 		$prenom = $data['prenom'] ?? "";
 		$adresse = $data['adresse'] ?? "";
 		$codePostal = $data['codePostal'] ?? "";
