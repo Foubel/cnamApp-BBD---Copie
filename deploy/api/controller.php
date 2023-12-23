@@ -87,6 +87,7 @@ require_once '../bootstrap.php';
 	function postLogin(Request $request, Response $response, $args) {   
 		global $entityManager;
 		$data = $request->getParsedBody();
+
 		$login = $data['login'] ?? "";
 		$password = $data['password'] ?? "";
 
@@ -144,7 +145,8 @@ require_once '../bootstrap.php';
 			$utilisateur->setEmail($email);
 			$utilisateur->setSexe($sexe);
 			$utilisateur->setLogin($login);
-			$utilisateur->setPassword(password_hash($password, PASSWORD_DEFAULT));
+			//$utilisateur->setPassword(password_hash($password, PASSWORD_DEFAULT));
+			$utilisateur->setPassword($password);
 			$utilisateur->setTelephone($telephone);
 
 			$entityManager->persist($utilisateur);
