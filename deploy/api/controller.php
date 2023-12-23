@@ -1,6 +1,7 @@
 <?php
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+require_once 'bootstrap.php';
 
 	function optionsCatalogue (Request $request, Response $response, $args) {
 	    
