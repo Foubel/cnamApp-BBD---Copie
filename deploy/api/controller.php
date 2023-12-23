@@ -62,8 +62,6 @@ require_once '../bootstrap.php';
 		return addHeaders($response);
 	}
 	
-
-	
 	function optionsUtilisateur (Request $request, Response $response, $args) {
 	    
 	    // Evite que le front demande une confirmation à chaque modification
@@ -109,6 +107,65 @@ require_once '../bootstrap.php';
 		}
 
 		return addHeaders($response);
+	}
+
+	function postRegister(Request $request, Response $response, $args) {
+		global $entityManager;
+		$data = $request->getParsedBody();
+		$nom = $data['nom'] ?? "";
+		$prenom = $data['prenom'] ?? "";
+		$adresse = $data['adresse'] ?? "";
+		$codePostal = $data['codePostal'] ?? "";
+		$ville = $data['ville'] ?? "";
+		$email = $data['email'] ?? "";
+		$sexe = $data['sexe'] ?? "";
+		$login = $data['login'] ?? "";
+		$password = $data['password'] ?? "";
+		$telephone = $data['telephone'] ?? "";
+
+		//on netttoie les données
+		$nom = filter_var($nom, FILTER_SANITIZE_STRING);
+		$prenom = filter_var($prenom, FILTER_SANITIZE_STRING);
+		$adresse = filter_var($adresse, FILTER_SANITIZE_STRING);
+		$codePostal = filter_var($codePostal, FILTER_SANITIZE_STRING);
+		$ville = filter_var($ville, FILTER_SANITIZE_STRING);
+		$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+		$sexe = filter_var($sexe, FILTER_SANITIZE_STRING);
+		$login = filter_var($login, FILTER_SANITIZE_STRING);
+		$password = filter_var($password, FILTER_SANITIZE_STRING);
+		$telephone = filter_var($telephone, FILTER_SANITIZE_STRING);
+		
+
+		$utilisateurRepository = $entityManager->getRepository('Utilisateur');
+		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
+
+		if ($utilisateur) {
+			$response = $response->withStatus(401)->withJson(['error' => 'User already exists']);
+		} else {
+			$utilisateur = new Utilisateur();
+			$utilisateur->setNom($nom);
+			$utilisateur->setPrenom($prenom);
+			$utilisateur->setAdresse($adresse);
+			$utilisateur->setCodePostal($codePostal);
+			$utilisateur->setVille($ville);
+			$utilisateur->setEmail($email);
+			$utilisateur->setSexe($sexe);
+			$utilisateur->setLogin($login);
+			$utilisateur->setPassword(password_hash($password, PASSWORD_DEFAULT));
+			$utilisateur->setTelephone($telephone);
+
+			$entityManager->persist($utilisateur);
+			$entityManager->flush();
+
+			$userData = [
+				'id' => $utilisateur->getId(),
+				'nom' => $utilisateur->getNom(),
+				'prenom' => $utilisateur->getPrenom()
+			];
+
+			$response = createJwt($response, $userData);
+			$response->getBody()->write(json_encode($userData));
+			return addHeaders($response);
 	}
 
 	
