@@ -47,7 +47,7 @@ require_once '../bootstrap.php';
 		}
 	
 		$catalogueItems = $queryBuilder->getQuery()->getResult();
-
+		
 		$catalogueArray = [];
 		foreach ($catalogueItems as $item) {
 			$catalogueArray[] = [
@@ -62,6 +62,7 @@ require_once '../bootstrap.php';
 		return addHeaders($response);
 	}
 	
+
 	
 	function optionsUtilisateur (Request $request, Response $response, $args) {
 	    
@@ -85,13 +86,30 @@ require_once '../bootstrap.php';
 	}
 
 	// APi d'authentification générant un JWT
-	function postLogin (Request $request, Response $response, $args) {   
-	    
-		$flux = '{"nom":"martin","prenom":"jean"}';
-	    
-	    $response = createJwT ($response);
-	    $response->getBody()->write($flux );
-	    
-	    return addHeaders ($response);
+	function postLogin(Request $request, Response $response, $args) {   
+		global $entityManager;
+		$data = $request->getParsedBody();
+		$login = $data['login'] ?? "";
+		$password = $data['password'] ?? "";
+
+		$utilisateurRepository = $entityManager->getRepository('Utilisateur');
+		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
+
+		if ($utilisateur && password_verify($password, $utilisateur->getPassword())) {
+			$userData = [
+				'id' => $utilisateur->getId(),
+				'nom' => $utilisateur->getNom(),
+				'prenom' => $utilisateur->getPrenom()
+			];
+
+			$response = createJwt($response, $userData);
+			$response->getBody()->write(json_encode($userData));
+		} else {
+			$response = $response->withStatus(401)->withJson(['error' => 'Invalid credentials']);
+		}
+
+		return addHeaders($response);
 	}
+
+	
 

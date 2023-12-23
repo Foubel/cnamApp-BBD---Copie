@@ -6,27 +6,31 @@
 	
 	const JWT_SECRET = "TP-CNAM";
 
-	function getJWTToken($request)
-	{
-	    $payload = str_replace("Bearer ", "", $request->getHeader('Authorization')[0]);
-	    $token = JWT::decode($payload,JWT_SECRET , array("HS256"));
-	    return $token; 
+	function getJWTToken($request) {
+		try {
+			$payload = str_replace("Bearer ", "", $request->getHeader('Authorization')[0]);
+			$token = JWT::decode($payload, JWT_SECRET, ["HS256"]);
+			return $token;
+		} catch (Exception $e) {
+			echo $e->getMessage();
+			return null;
+		}
 	}
+	
 
-	function createJwt (Response $response) : Response {
-	    $userid = "emma";
-	    $email = "emma@emma.fr";
-	    $issuedAt = time();
-	    $expirationTime = $issuedAt + 600; // jwt valid for 60 seconds from the issued time
-	    $payload = array(
-		'userid' => $userid,
-		'iat' => $issuedAt,
-		'exp' => $expirationTime
-	    );
-	    $token_jwt = JWT::encode($payload,JWT_SECRET, "HS256");
-	    $response = $response->withHeader("Authorization", "Bearer {$token_jwt}");
-	    return $response;
+	function createJwt(Response $response, $userData) {
+		$issuedAt = time();
+		$expirationTime = $issuedAt + 600;
+		$payload = [
+			'userid' => $userData['id'],
+			'iat' => $issuedAt,
+			'exp' => $expirationTime
+		];
+	
+		$token_jwt = JWT::encode($payload, JWT_SECRET, "HS256");
+		return $response->withHeader("Authorization", "Bearer {$token_jwt}");
 	}
+	
 
 	// Middleware de validation du Jwt
 	$options = [
