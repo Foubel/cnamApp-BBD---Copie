@@ -141,7 +141,7 @@ require_once '../bootstrap.php';
 		if ($utilisateur) {
 			$response = $response->withStatus(401)->withJson(['error' => 'User already exists']);
 		} else {
-			$utilisateur = new Utilisateur();
+			$utilisateur = new Utilisateurs();
 			$utilisateur->setNom($nom);
 			$utilisateur->setPrenom($prenom);
 			$utilisateur->setAdresse($adresse);
