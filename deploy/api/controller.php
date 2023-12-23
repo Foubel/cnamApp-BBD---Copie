@@ -108,7 +108,7 @@ require_once '../bootstrap.php';
 		} else {
 			$response = $response->withStatus(401);
 			$response = $response->withHeader('Content-Type', 'application/json');
-			$response->getBody()->write(json_encode(['error' => 'Login failed']));
+			$response->getBody()->write(json_encode(['error' => 'Login failed', $utilisateur]));
 		}
 
 		return addHeaders($response);
