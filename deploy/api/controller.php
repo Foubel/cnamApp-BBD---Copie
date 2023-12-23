@@ -71,6 +71,7 @@ require_once '../bootstrap.php';
 	}
 
 	// API Nécessitant un Jwt valide
+	/*
 	function getUtilisateur (Request $request, Response $response, $args) {
 	    
 	    $payload = getJWTToken($request);
@@ -81,7 +82,7 @@ require_once '../bootstrap.php';
 	    $response->getBody()->write($flux);
 	    
 	    return addHeaders ($response);
-	}
+	} */
 
 	// APi d'authentification générant un JWT
 	function postLogin(Request $request, Response $response, $args) {   
