@@ -1,6 +1,7 @@
 <?php
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+
 // require once bootstrap.php
 require_once '../bootstrap.php';
 
@@ -24,8 +25,25 @@ require_once '../bootstrap.php';
 	function getCatalogue(Request $request, Response $response, $args) {
 		global $entityManager;
 		$catalogueRepository = $entityManager->getRepository('Catalogue');
-		$catalogueItems = $catalogueRepository->findAll();
-
+		
+		$queryParams = $request->getQueryParams();
+		$criteria = [];
+	
+		if (!empty($queryParams['id'])) {
+			$criteria['id'] = $queryParams['id'];
+		}
+		if (!empty($queryParams['name'])) {
+			$criteria['name'] = $queryParams['name'];
+		}
+		if (!empty($queryParams['description'])) {
+			$criteria['description'] = $queryParams['description'];
+		}
+		if (!empty($queryParams['price'])) {
+			$criteria['price'] = (string) $queryParams['price'];
+		}
+	
+		$catalogueItems = $catalogueRepository->findBy($criteria);
+	
 		$catalogueArray = [];
 		foreach ($catalogueItems as $item) {
 			$catalogueArray[] = [
@@ -35,10 +53,11 @@ require_once '../bootstrap.php';
 				'price' => $item->getPrice(),
 			];
 		}
-
+	
 		$response->getBody()->write(json_encode($catalogueArray));
 		return addHeaders($response);
 	}
+	
 
 	
 	function optionsUtilisateur (Request $request, Response $response, $args) {
