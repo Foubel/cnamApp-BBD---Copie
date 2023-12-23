@@ -131,7 +131,9 @@ require_once '../bootstrap.php';
 		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
 
 		if ($utilisateur) {
-			$response = $response->withStatus(401)->withJson(['error' => 'User already exists']);
+			$response = $response->withStatus(401);
+			$response = $response->withHeader('Content-Type', 'application/json');
+			$response->getBody()->write(json_encode(['error' => 'Login already exists']));
 		} else {
 			$utilisateur = new Utilisateurs();
 			$utilisateur->setNom($nom);
