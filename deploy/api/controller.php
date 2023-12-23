@@ -94,7 +94,8 @@ require_once '../bootstrap.php';
 		$utilisateurRepository = $entityManager->getRepository('Utilisateurs');
 		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
 
-		if ($utilisateur && password_verify($password, $utilisateur->getPassword())) {
+		//if ($utilisateur && password_verify($password, $utilisateur->getPassword())) {
+		if ($utilisateur && $password == $utilisateur->getPassword()) {
 			$userData = [
 				'id' => $utilisateur->getId(),
 				'nom' => $utilisateur->getNom(),
