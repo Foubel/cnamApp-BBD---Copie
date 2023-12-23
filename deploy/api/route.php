@@ -14,6 +14,14 @@
 
 	// APi d'authentification générant un JWT
 	$app->post('/api/utilisateur/login', 'postLogin');
+
+	$app->get('/api/test', function (Request $request, Response $response, $args) {
+		$response->getBody()->write("Test route");
+		return $response;
+	});
+	
+
+
 	
 	
 
