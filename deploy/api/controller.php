@@ -134,7 +134,7 @@ require_once '../bootstrap.php';
 		$login = filter_var($login, FILTER_SANITIZE_STRING);
 		$password = filter_var($password, FILTER_SANITIZE_STRING);
 		$telephone = filter_var($telephone, FILTER_SANITIZE_STRING);
-		
+
 
 		$utilisateurRepository = $entityManager->getRepository('Utilisateur');
 		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
@@ -165,7 +165,8 @@ require_once '../bootstrap.php';
 
 			$response = createJwt($response, $userData);
 			$response->getBody()->write(json_encode($userData));
-			return addHeaders($response);
+		}
+		return addHeaders($response);
 	}
 
 	
