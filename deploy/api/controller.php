@@ -101,9 +101,12 @@ require_once '../bootstrap.php';
 			];
 
 			$response = createJwt($response, $userData);
+			$response = $response->withHeader('Content-Type', 'application/json');
 			$response->getBody()->write(json_encode($userData));
 		} else {
-			$response = $response->withStatus(401)->withJson(['error' => 'Invalid credentials']);
+			$response = $response->withStatus(401);
+			$response = $response->withHeader('Content-Type', 'application/json');
+			$response->getBody()->write(json_encode(['error' => 'Login failed']));
 		}
 
 		return addHeaders($response);
@@ -152,6 +155,7 @@ require_once '../bootstrap.php';
 			];
 
 			$response = createJwt($response, $userData);
+			$response = $response->withHeader('Content-Type', 'application/json');
 			$response->getBody()->write(json_encode($userData));
 		}
 		return addHeaders($response);
