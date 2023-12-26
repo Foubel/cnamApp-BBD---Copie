@@ -42,9 +42,9 @@ require_once '../bootstrap.php';
 						 ->setParameter('description', '%' . $queryParams['description'] . '%');
 		}
 		if (!empty($queryParams['price'])) {
-			$queryBuilder->andWhere('CAST(c.price AS CHAR) LIKE :price')
+			$queryBuilder->andWhere('c.price LIKE :price')
 						 ->setParameter('price', '%' . $queryParams['price'] . '%');
-		}
+		}		
 	
 		$catalogueItems = $queryBuilder->getQuery()->getResult();
 		
@@ -69,20 +69,6 @@ require_once '../bootstrap.php';
 	    
 	    return addHeaders ($response);
 	}
-
-	// API Nécessitant un Jwt valide
-	/*
-	function getUtilisateur (Request $request, Response $response, $args) {
-	    
-	    $payload = getJWTToken($request);
-	    $login  = $payload->userid;
-	    
-		$flux = '{"nom":"martin","prenom":"jean"}';
-	    
-	    $response->getBody()->write($flux);
-	    
-	    return addHeaders ($response);
-	} */
 
 	// APi d'authentification générant un JWT
 	function postLogin(Request $request, Response $response, $args) {   
