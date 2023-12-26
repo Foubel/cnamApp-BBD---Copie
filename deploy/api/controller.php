@@ -88,32 +88,38 @@ require_once '../bootstrap.php';
 	function postLogin(Request $request, Response $response, $args) {   
 		global $entityManager;
 		$data = $request->getParsedBody();
-
+	
 		$login = $data['login'] ?? "";
 		$password = $data['password'] ?? "";
-
+	
+		if (!preg_match("/[a-zA-Z0-9]{1,20}/", $login) || !preg_match("/[a-zA-Z0-9]{1,20}/", $password)) {
+			return $response->withStatus(400)
+							->withHeader('Content-Type', 'application/json')
+							->write(json_encode(['error' => 'Invalid input format']));
+		}
+	
 		$utilisateurRepository = $entityManager->getRepository('Utilisateurs');
 		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
-
+	
 		if ($utilisateur && password_verify($password, $utilisateur->getPassword())) {
 			$userData = [
 				'id' => $utilisateur->getId(),
 				'nom' => $utilisateur->getNom(),
 				'prenom' => $utilisateur->getPrenom()
 			];
-
+	
 			$response = createJwt($response, $userData);
 			$response = $response->withHeader('Content-Type', 'application/json');
 			$response->getBody()->write(json_encode($userData));
 		} else {
-			$response = $response->withStatus(401);
-			$response = $response->withHeader('Content-Type', 'application/json');
-			$response->getBody()->write(json_encode(['error' => 'Login failed', $utilisateur]));
+			return $response->withStatus(401)
+							->withHeader('Content-Type', 'application/json')
+							->write(json_encode(['error' => 'Login failed']));
 		}
-
+	
 		return addHeaders($response);
 	}
-
+	
 	function postRegister(Request $request, Response $response, $args) {
 		global $entityManager;
 		$data = $request->getParsedBody();
@@ -128,42 +134,56 @@ require_once '../bootstrap.php';
 		$login = $data['login'] ?? "";
 		$password = $data['password'] ?? "";
 		$telephone = $data['telephone'] ?? "";
-
-		$utilisateurRepository = $entityManager->getRepository('Utilisateurs');
-		$utilisateur = $utilisateurRepository->findOneBy(['login' => $login]);
-
-		if ($utilisateur) {
-			$response = $response->withStatus(401);
-			$response = $response->withHeader('Content-Type', 'application/json');
-			$response->getBody()->write(json_encode(['error' => 'Login already exists']));
-		} else {
-			$utilisateur = new Utilisateurs();
-			$utilisateur->setNom($nom);
-			$utilisateur->setPrenom($prenom);
-			$utilisateur->setAdresse($adresse);
-			$utilisateur->setCodePostal($codePostal);
-			$utilisateur->setVille($ville);
-			$utilisateur->setEmail($email);
-			$utilisateur->setSexe($sexe);
-			$utilisateur->setLogin($login);
-			$utilisateur->setPassword(password_hash($password, PASSWORD_DEFAULT));
-			$utilisateur->setTelephone($telephone);
-
-			$entityManager->persist($utilisateur);
-			$entityManager->flush();
-
-			$userData = [
-				'id' => $utilisateur->getId(),
-				'nom' => $utilisateur->getNom(),
-				'prenom' => $utilisateur->getPrenom()
-			];
-
-			$response = createJwt($response, $userData);
-			$response = $response->withHeader('Content-Type', 'application/json');
-			$response->getBody()->write(json_encode($userData));
+	
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			return $response->withStatus(400)
+							->withHeader('Content-Type', 'application/json')
+							->write(json_encode(['error' => 'Invalid email format']));
 		}
+	
+		$utilisateurRepository = $entityManager->getRepository('Utilisateurs');
+		
+		$existingEmail = $utilisateurRepository->findOneBy(['email' => $email]);
+		if ($existingEmail) {
+			return $response->withStatus(409)
+						   ->withHeader('Content-Type', 'application/json')
+						   ->write(json_encode(['error' => 'Email already exists']));
+		}
+	
+		$existingLogin = $utilisateurRepository->findOneBy(['login' => $login]);
+		if ($existingLogin) {
+			return $response->withStatus(409)
+						   ->withHeader('Content-Type', 'application/json')
+						   ->write(json_encode(['error' => 'Login already exists']));
+		}
+	
+		$utilisateur = new Utilisateurs();
+		$utilisateur->setNom($nom);
+		$utilisateur->setPrenom($prenom);
+		$utilisateur->setAdresse($adresse);
+		$utilisateur->setCodePostal($codePostal);
+		$utilisateur->setVille($ville);
+		$utilisateur->setEmail($email);
+		$utilisateur->setSexe($sexe);
+		$utilisateur->setLogin($login);
+		$utilisateur->setPassword(password_hash($password, PASSWORD_DEFAULT));
+		$utilisateur->setTelephone($telephone);
+	
+		$entityManager->persist($utilisateur);
+		$entityManager->flush();
+	
+		$userData = [
+			'id' => $utilisateur->getId(),
+			'nom' => $utilisateur->getNom(),
+			'prenom' => $utilisateur->getPrenom()
+		];
+	
+		$response = createJwt($response, $userData);
+		$response = $response->withHeader('Content-Type', 'application/json');
+		$response->getBody()->write(json_encode($userData));
+	
 		return addHeaders($response);
 	}
-
+	
 	
 
